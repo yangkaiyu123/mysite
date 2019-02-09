@@ -1,0 +1,253 @@
+{% extends 'layout.html' %}
+
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.css' %}">
+    <style>
+        .hide {
+            display: none;
+        }
+
+        .shadow1 {
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background-color: black;
+            opacity: 0.4;
+            z-index: 999;
+        }
+
+        .loading {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            left: 50%;
+            top: 50%;
+            margin-left: -125px;
+            margin-top: -125px;
+            background-image: url("{% static 'imgs/5aa0d93810b29.gif' %}");
+        }
+
+        .add-modal {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            height: 400px;
+            width: 400px;
+            background-color: #fff;
+            margin-left: -260px;
+            margin-top: -250px;
+            z-index: 1000;
+        }
+
+        .edit-modal{
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            height: 400px;
+            width: 400px;
+            background-color: #fff;
+            margin-left: -260px;
+            margin-top: -250px;
+            z-index: 1000;
+        }
+
+        .pg-body .content a:hover {
+            text-decoration: none;
+            color: red;
+        }
+    </style>
+{% endblock %}
+
+{% block xxx %}
+    <ol class="breadcrumb">
+        <li><a href="#">首页</a></li>
+        <li><a href="#">教师管理</a></li>
+        <li class="active">查看教师</li>
+    </ol>
+    <div style="margin: 10px 0">
+        <a class="btn btn-primary" href="{% url 'stu:add_teacher' %}">添加老师</a>
+        <a class="btn btn-success" id="btnAdd">对话框添加</a>
+    </div>
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>老师姓名</th>
+            <th>老师班级</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in teacher_list %}
+            <tr>
+                <td>{{ row.tid }}</td>
+                <td>{{ row.name }}</td>
+                <td>
+                    {% for item in row.titles %}
+                        <span style="display: inline-block; padding: 5px;">{{ item }}</span>
+                    {% endfor %}
+                </td>
+                <td>
+                    <a href="{% url 'stu:del_teacher' %}?t_id={{ row.tid }}">删除</a>
+                    <a class="btn btn-info" id="btn_edit" >模态框编辑</a>
+                    <a href="{% url 'stu:edit_teacher' %}?nid={{ row.tid }}">编辑</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {#添加对话框#}
+    <div id="shadow" class="shadow1 hide"></div>
+    <div id="loading" class="loading hide"></div>
+    <div id="addModal" class="add-modal hide">
+        <p>老师姓名：</p>
+        <p><input type="text" name="name" id="addName"></p>
+        <select multiple size="12" name="" id="classIds"></select>
+        <p></p>
+        <button class="btn btn-primary" id="addSubmit" href="">提交</button>
+        <a class="btn btn-info" id="ajaxCancel" href="">取消</a>
+    </div>
+    {#编辑对话框#}
+    <div id="editModal" class="edit-modal hide">
+        <input type="text" name="edit_tid" id="edit_tid" style="display: none">
+        <p>老师姓名<input type="text" name="t_name" id="editName"></p>
+        <p></p>
+        <select multiple size="12" name="c_names" id="class_Ids"></select>
+        <p></p>
+        <button class="btn btn-success" id="editSubmit">提交</button>
+        <a class="btn btn-info" id="editAjaxCancel" href="">取消</a>
+    </div>
+{% endblock %}
+
+{% block js %}
+
+    <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
+    <script src="{% static 'bootstrap-3.3.7-dist/js/bootstrap.js' %}"></script>
+    <script>
+        $(function () {
+            bindAdd();
+            bindAddSubmit();
+            bindCancel();
+            bindEdit();
+            bindEditSubmit();
+            bindEditCancel();
+        });
+
+        function bindAdd() {
+            $('#btnAdd').click(function () {
+                $('#shadow, #loading').removeClass('hide');
+                /*
+                发送ajax请求获取所有班级信息
+                 */
+                $.ajax({
+                    url: "{% url 'stu:get_all_class' %}",
+                    type: 'GET',
+                    dataType: 'JSON',
+                    success: function (arg) {
+                        // console.log(arg);
+                        // 将所有数据添加到 select，option
+                        $.each(arg, function (i, row) {
+                            var tag = document.createElement('option');
+                            tag.innerHTML = row.title;
+                            tag.setAttribute('value', row.id);
+                            $('#classIds').append(tag);
+                        });
+                        $('#loading').addClass('hide');
+                        $('#addModal').removeClass('hide');
+                    }
+                });
+            })
+        }
+
+        function bindAddSubmit() {
+            $('#addSubmit').click(function () {
+                var name = $('#addName').val();
+                var class_id_list = $('#classIds').val();
+                $.ajax({
+                    url: "{% url 'stu:modal_add_teacher' %}",
+                    type: 'POST',
+                    data: {'name': name, 'class_id_list': class_id_list},
+                    dataType: 'JSON',
+                    traditional: true,
+                    success: function (arg) {
+                        if (arg.status) {
+                            location.reload();
+                        } else {
+                            alert(arg.message)
+                        }
+                    }
+                })
+            });
+        }
+
+        function bindCancel() {
+            $('#ajaxCancel').click(function () {
+                $('#shadow, #loading').removeClass('hide')
+            })
+        }
+        
+        function bindEdit() {
+            $("[id=btn_edit]").click(function () {
+                $('#shadow, #loading').removeClass('hide');
+                var v = $(this).parent().prevAll();
+                var t_name = v[1].innerText;
+                $('#editName').val(t_name);
+                var t_id = v[2].innerText;
+                $('#edit_tid').val(t_id);
+                /*
+                发送ajax请求获取所有班级信息/
+                 */
+                $.ajax({
+                    url: "{% url 'stu:get_all_class' %}",
+                    type: 'GET',
+                    dataType: 'JSON',
+                    success: function (arg) {
+                        $.each(arg, function (i,row) {
+                            var tag = document.createElement('option');
+                            tag.innerHTML = row.title;
+                            tag.setAttribute('value' , row.id);
+                            $('#class_Ids').append(tag)
+                        });
+                        $('#loading').addClass('hide');
+                        $('#editModal').removeClass('hide');
+                    }
+                });
+
+            })
+        }
+
+        function bindEditSubmit() {
+            $('#editSubmit').click(function () {
+                var name = $('#editName').val();
+                var class_id_list = $('#class_Ids').val();
+                var t_id = $('#edit_tid').val();
+                console.log(name ,class_id_list, t_id);
+                $.ajax({
+                    url: "{% url 'stu:modal_edit_teacher' %}",
+                    type: 'POST',
+                    data: {'name': name, 'class_id_list': class_id_list ,'t_id': t_id},
+                    dataType: 'JSON',
+                    traditional: true,
+                    success: function (arg) {
+                        if (arg.status){
+                            location.reload();
+                        } else{
+                            alert(arg.message)
+                        }
+                    }
+                })
+            })
+        }
+
+        function bindEditCancel() {
+            $('#editAjaxCancel').click(function () {
+                $('#shadow, #loading').removeClass('hide')
+            })
+        }
+    </script>
+{% endblock %}

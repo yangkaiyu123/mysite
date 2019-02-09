@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>添加班级</h1>
+    <form action="{% url 'stu:add_class' %}" method="post">
+        <p>班级名称</p>
+        <input type="text" name="c_name">
+        <input type="submit"  value="提交">
+    </form>
+    {{ msg }}
+</body>
+</html>
+
+
+
+
+
+
+

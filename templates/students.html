@@ -1,0 +1,183 @@
+{% extends 'layout.html' %}
+
+{% load staticfiles %}
+
+{% block css %}
+<style>
+    .hide {
+        display: none;
+    }
+
+    .shadow {
+        position: fixed;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        background-color: black;
+        opacity: 0.4;
+        z-index: 900;
+    }
+
+    .modal1 {
+        z-index: 1030;
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        height: 300px;
+        width: 400px;
+        background-color: #fff;
+        margin-left: -200px;
+        margin-top: -150px;
+    }
+
+    #modalEdit {
+        z-index: 1040;
+    }
+</style>
+{% endblock %}
+
+{% block xxx %}
+    <ol class="breadcrumb">
+        <li><a href="#">首页</a></li>
+        <li><a href="#">学生管理</a></li>
+        <li class="active">查看学生</li>
+    </ol>
+    <div style="margin: 10px 0">
+        <a class="btn btn-primary" href="{% url 'stu:add_students' %}">添加学生</a>
+        <a class="btn btn-success" onclick="addstu();">模态框添加学生</a>
+    </div>
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>姓名</th>
+            <th>班级</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in stu_list %}
+            <tr>
+                <td>{{ row.id }}</td>
+                <td>{{ row.name }}</td>
+                <td c_id="{{ row.cid }}">{{ row.title }}</td>
+                <td>
+                    <a href="{% url 'stu:del_students' %}?pk={{ row.id }}">删除</a>
+                    <a onclick="editModal(this);">模态框编辑</a>
+                    <a href="{% url 'stu:edit_students' %}?pk={{ row.id }}">编辑</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div id="addstu_shadow" class="shadow hide"></div>
+    <div id="addstu_modal" class="modal1 hide">
+        <h1>添加学生</h1>
+        <p>学生姓名</p>
+        <input type="text" id="s_name">
+        <p>学生班级</p>
+        <select name="c_id" id="c_id">
+            {% for item in class_list %}
+                <option value="{{ item.id }}">{{ item.title }}</option>
+            {% endfor %}
+        </select>
+        <button onclick="addAjaxSend();">提交</button>
+        <span id="errormsg"></span>
+        <button onclick="cancel_addModal();">取消</button>
+    </div>
+
+    <div id="editshadow" class="shadow hide"></div>
+    <div id="editmodal" class="modal1 hide">
+        <h1>编辑学生</h1>
+        <p>学生姓名</p>
+        <input type="text" id="edit_s_id" style="display: none">
+        <input type="text" id="edit_s_name">
+        <p>学生班级</p>
+        <select name="edit_c_id" id="edit_c_id">
+            {% for item in class_list %}
+                {% if item.id == stu_list.cid %}
+                    <option selected value="{{ item.id }}">{{ item.title }}</option>
+                {% else %}
+                    <option value="{{ item.id }}">{{ item.title }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        <button onclick="editAjaxSend();">提交</button>
+        <span id="errormsg"></span>
+        <button onclick="cancel_editModal();">取消</button>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
+    <script>
+    function addstu(){
+        document.getElementById('addstu_shadow').classList.remove('hide');
+        document.getElementById('addstu_modal').classList.remove('hide');
+    }
+
+    function addAjaxSend() {
+        var s_name = $('#s_name').val();
+        var c_id = $('#c_id').val();
+        $.ajax({
+            url: "{% url 'stu:modal_add_stu' %}",
+            type: "POST",
+            data: {'s_name': s_name, 'c_id': c_id},
+            success: function (data) {
+                if (data == 'OK'){
+                    location.reload()
+                }else{
+                    $('#errormsg').text(data)
+                }
+            }
+        })
+    }
+
+    function editAjaxSend() {
+        var edit_s_name = $('#edit_s_name').val();
+        var edit_s_id = $('#edit_s_id').val();
+        var edit_c_id = $('#edit_c_id').val();
+
+        console.log(edit_s_id, edit_c_id, edit_s_name);
+
+        $.ajax({
+            url: "{% url 'stu:modal_edit_stu' %}",
+            type: 'POST',
+            data: {'edit_s_name': edit_s_name, 'edit_c_id': edit_c_id, 'edit_s_id': edit_s_id},
+            success: function (arg) {
+                arg = JSON.parse(arg);
+                if (arg.status){
+                    location.reload()
+                }else{
+                    alert(arg.message)
+                }
+            }
+        })
+    }
+
+    function editModal(ths) {
+        document.getElementById('editshadow').classList.remove('hide');
+        document.getElementById('editmodal').classList.remove('hide');
+
+        var v = $(ths).parent().prevAll();
+
+        var edit_c_id = $(v[0]).attr('c_id');
+        $('#edit_c_id').val(edit_c_id);
+        var edit_s_name = $(v[1]).text();
+        $('#edit_s_name').val(edit_s_name);
+        var edit_s_id = $(v[2]).text();
+        $('#edit_s_id').val(edit_s_id)
+
+    }
+    function cancel_editModal() {
+        document.getElementById('editshadow').classList.add('hide');
+        document.getElementById('editmodal').classList.add('hide');
+    }
+
+    function cancel_addModal() {
+        document.getElementById('addstu_shadow').classList.add('hide');
+        document.getElementById('addstu_modal').classList.add('hide');
+    }
+</script>
+{% endblock %}

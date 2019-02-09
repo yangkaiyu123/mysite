@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>添加老师</h1>
+    <form method="post" action="{% url 'stu:add_teacher' %}">
+        <p><input type="text" name="name" placeholder="老师姓名"></p>
+        <p>
+            <select multiple size="11" name="class_ids" id="">
+                {% for item in class_list %}
+                    <option value="{{ item.id }}">{{ item.title }}</option>
+                {% endfor %}
+            </select>
+        </p>
+        <input type="submit" value="提交">
+    </form>
+</body>
+</html>

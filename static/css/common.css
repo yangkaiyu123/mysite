@@ -1,0 +1,105 @@
+@charset "UTF-8";
+html, body, ul, h1 {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
+.hide {
+    display: none;
+}
+
+.pg-header {
+    height: 48px;
+    min-width: 1190px;
+    background-color: #0497e1;
+    line-height: 48px;
+}
+
+.pg-header .logo {
+    margin: 0px;
+    color: white;
+    font-size: 18px;
+    width: 200px;
+    text-align: center;
+    border-right: 1px solid darkgray;
+}
+
+.pg-header .rmenus a {
+    display: inline-block;
+    padding: 0 15px;
+    color: white;
+}
+
+.pg-header .rmenus a:hover {
+    background-color: #63cfff;
+}
+
+.pg-header .avatar {
+    padding: 0 20px;
+}
+
+.pg-header .avatar:hover .user-info {
+    display: block;
+}
+
+.pg-header .avatar img {
+    border-radius: 50%;
+}
+
+.pg-header .avatar .user-info {
+    display: none;
+    background-color: white;
+    border: 1px solid red;
+    position: absolute;
+    width: 200px;
+    top: 48px;
+    right: 2px;
+    background-color: #fff;
+    z-index: 100;
+}
+
+.pg-header .avatar .user-info a {
+    text-decoration: none;
+}
+
+.pg-body .menus a {
+    display: block;
+    padding: 10px 5px;
+    border-bottom: 1px solid darkgray;
+    text-decoration: none;
+}
+
+.menus {
+    width: 200px;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    top: 48px;
+    background-color: lightgray;
+    border-right: 1px solid darkgray;
+}
+
+.content {
+    position: absolute;
+    left: 200px;
+    right: 0;
+    top: 48px;
+    bottom: 0;
+    background-color: white;
+    min-width: 990px;
+    overflow: scroll;
+    /*z-index: 99;*/
+}

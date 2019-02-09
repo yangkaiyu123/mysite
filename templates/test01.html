@@ -1,0 +1,101 @@
+{% extends 'layout.html' %}
+
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.css' %}">
+
+{% endblock %}
+
+{% block xxx %}
+    <!-- Button trigger modal -->
+<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+  Launch demo modal
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+
+    <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
+    <script src="{% static 'bootstrap-3.3.7-dist/js/bootstrap.js' %}"></script>
+    <script>
+        $(function () {
+            bindAdd();
+            bindAddSubmit();
+            bindCancel();
+        });
+
+        function bindAdd() {
+            $('#btnAdd').click(function () {
+                $('#shadow, #loading').removeClass('hide');
+                /*
+                发送ajax请求获取所有班级信息
+                 */
+                $.ajax({
+                    url: "{% url 'get_all_class' %}",
+                    type: 'GET',
+                    dataType: 'JSON',
+                    success: function (arg) {
+                        // console.log(arg);
+                        // 将所有数据添加到 select，option
+                        $.each(arg, function (i, row) {
+                            var tag = document.createElement('option');
+                            tag.innerHTML = row.title;
+                            tag.setAttribute('value', row.id);
+                            $('#classIds').append(tag);
+                        });
+                        $('#loading').addClass('hide');
+                        $('#addModal').removeClass('hide');
+                    }
+                });
+            })
+        }
+
+        function bindAddSubmit() {
+            $('#addSubmit').click(function () {
+                var name = $('#addName').val();
+                var class_id_list = $('#classIds').val();
+                console.log(name, class_id_list);
+                $.ajax({
+                    url: "{% url 'modal_add_teacher' %}",
+                    type: 'POST',
+                    data: {'name': name, 'class_id_list': class_id_list},
+                    dataType: 'JSON',
+                    traditional: true,
+                    success: function (arg) {
+                        if (arg.status) {
+                            location.reload();
+                        } else {
+                            alert(arg.message)
+                        }
+                    }
+                })
+            });
+        }
+
+        function bindCancel() {
+            $('#ajaxCancel').click(function () {
+                $('#shadow, #loading').removeClass('hide')
+            })
+        }
+    </script>
+{% endblock %}

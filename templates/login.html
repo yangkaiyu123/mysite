@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{% static 'css/ulogin.css' %}">
+</head>
+<body>
+<div class="box">
+    <div class="head"></div>
+    <div class="bgc"></div>
+    <p>作者：杨恺俞</p>
+    <div class="login">
+        <form action="{% url 'stu:login' %}" method="post" novalidate>
+            <div class="sp"><span>平台登录</span></div>
+            <div class="in">{{ obj.uname }}</div>
+            <div class="in">{{ obj.pwd }}</div>
+            <button type="submit">登录</button>
+            <a href="{% url 'stu:register' %}">注册</a>
+        </form>
+        <span style="color: red">{{ obj.errors.uname.0 }}</span>
+        <span style="color: red">{{ obj.errors.pwd.0 }}</span>
+        <span style="color: red">{{ msg }}</span>
+    </div>
+</div>
+</body>
+</html>

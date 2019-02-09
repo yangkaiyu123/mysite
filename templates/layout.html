@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'font-awesome-4.7.0/css/font-awesome.css' %}">
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    {% block css %}
+
+    {% endblock %}
+</head>
+<body>
+<div class="pg-header">
+    <div class="logo left">yky教务管理系统</div>
+    <div class="avatar right" style="position: relative;">
+        <img style="width: 50px;height: 40px" src="{% static 'mone.jpg' %}" alt="">
+        <div class="user-info">
+            <a style="display: block" href="">个人资料</a>
+            <a style="display: block" href="{% url 'stu:logout' %}">注销</a>
+        </div>
+    </div>
+    <div class="rmenus right">
+        <a href=""><i class="fa fa-commenting-o" aria-hidden="true"></i>消息</a>
+        <a href=""><i class="fa fa-envelope-o" aria-hidden="true"></i>邮件</a>
+    </div>
+
+</div>
+<div class="pg-body">
+    <div class="menus">
+        <a href="{% url 'stu:classes' %}"><i class="fa fa-university" aria-hidden="true"></i>班级管理</a>
+        <a href="{% url 'stu:students' %}"><i class="fa fa-graduation-cap" aria-hidden="true"></i>学生管理</a>
+        <a href="{% url 'stu:teachers' %}"><i class="fa fa-coffee" aria-hidden="true"></i>教师管理</a>
+    </div>
+    <div class="content">
+        {% block xxx %}
+
+        {% endblock %}
+    </div>
+</div>
+{% block js %}
+
+{% endblock %}
+
+</body>
+</html>
